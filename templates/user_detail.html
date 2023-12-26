@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block main %}
+  <div class="container mt-5">
+    <div class="row justify-content-center">
+      <div class="col-md-8">
+        <div class="card mx-auto">
+          <div class="card-header bg-primary text-white text-center">
+            <h2>{{ user.name }} Details</h2>
+          </div>
+          <div class="card-body text-center">
+            <div class="mb-3">
+              <p class="card-text"><strong>Subscribe Date:</strong> {{ user.SubscribeDate.strftime('%d/%m/%Y') }}</p>
+            </div>
+            <div class="mb-3">
+              <p class="card-text"><strong>End of Subscription:</strong> {{ end_subscription_date.strftime('%d/%m/%Y') }}</p>
+            </div>
+            <div class="mb-3">
+                <p class="card-text"><strong>Phone:</strong> {{ user.phone[:2] }}.{{ user.phone[2:4] }}.{{ user.phone[4:6] }}.{{ user.phone[6:8] }}.{{ user.phone[8:] }}</p>
+            </div>
+            <div class="mb-3">
+              <p class="card-text"><strong>Commentaires:</strong> {{ user.commentaire or 'N/A' }}</p>
+            </div>
+            <div class="mb-3">
+              <p class="card-text"><strong>Parrain:</strong> {{ user.parrain.name if user.parrain else 'N/A' }}</p>
+            </div>
+            <div class="mb-3">
+              <p class="card-text"><strong>Fournisseur:</strong> {{ user.fournisseur or 'N/A' }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="text-center mt-4">
+    <a href="{{ url_for('show_users') }}" class="btn btn-primary btn-lg mb-3">Retour</a>
+  </div>
+{% endblock %}
