@@ -6,7 +6,7 @@ from flask_wtf import FlaskForm
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import or_
 from pymysql import IntegrityError
-from wtforms import DateField, HiddenField, StringField, BooleanField, SubmitField, TextAreaField
+from wtforms import DateField, HiddenField, SelectField, StringField, BooleanField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
 from datetime import datetime, timedelta
 from twilio.rest import Client
@@ -37,6 +37,7 @@ class User(db.Model):
     parrain = db.relationship('User', remote_side=[id], backref='filleuls')
     commentaire = db.Column(db.Text, nullable=False)
     fournisseur = db.Column(db.String(255), default='', nullable=True)
+    
 
     def __init__(self, name, SubscribeDate, phone, is_active=True, parrain=None, commentaire='', fournisseur=''):
         self.name = name
@@ -65,7 +66,7 @@ class RegistrationForm(FlaskForm):
     is_active = BooleanField('Account is Active')
     parrain_name = StringField('Parrain Name')
     commentaire = TextAreaField('Commentaire')
-    fournisseur = StringField('Fournisseur', validators=[InputRequired()])
+    fournisseur = SelectField('Fournisseur', choices=[('CoverIPTV', 'Cover IPTV')])
     submit = SubmitField('Add User')
 
 
@@ -78,7 +79,7 @@ class EditUserForm(FlaskForm):
     parrain_name = StringField('Parrain Name')
     commentaire = TextAreaField('Commentaire')
     submit = SubmitField('Update User')
-    fournisseur = StringField('Fournisseur', validators=[InputRequired()])
+    fournisseur = SelectField('Fournisseur', choices=[('CoverIPTV', 'Cover IPTV')])
 
     def populate_obj(self, obj):
         # Utilisez les valeurs existantes comme placeholders
@@ -184,13 +185,14 @@ def register():
             if existing_user:
                 flash('User with the same name already exists', 'danger')
             else:
+                
                 user = User(
-                    name=form.name.data,
+                    name=form.name.data.upper(),
+                    phone=form.phone.data.upper(),
+                    commentaire=form.commentaire.data.upper() if form.commentaire.data else None,
+                    fournisseur=form.fournisseur.data.upper() if form.fournisseur.data else None,
                     SubscribeDate=form.subscribe_date.data,
-                    phone=form.phone.data,
-                    is_active=form.is_active.data,
-                    commentaire=form.commentaire.data,
-                    fournisseur=form.fournisseur.data
+                    is_active=form.is_active.data
                 )
 
                 parrain_name = form.parrain_name.data
@@ -219,13 +221,21 @@ def edit_user_route(user_id):
 
     if request.method == 'POST' and form.validate_on_submit():
         form.user_id.data = user_id  # Ajouter user_id au formulaire
+
+        # Appliquer les modifications aux entrées
+        form.name.data = form.name.data.upper()
+        form.phone.data = form.phone.data.upper()
+        form.parrain_name.data = form.parrain_name.data.upper() if form.parrain_name.data else None
+        form.commentaire.data = form.commentaire.data.upper() if form.commentaire.data else None
+        form.fournisseur.data = form.fournisseur.data.upper() if form.fournisseur.data else None
+
         form.populate_obj(user)
         db.session.commit()
         flash('User updated successfully', 'success')
         return redirect(url_for('show_users'))
 
-
     return render_template('edit_user_route.html', form=form, user=user)
+
 
 
 

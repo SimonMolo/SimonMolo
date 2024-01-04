@@ -22,9 +22,6 @@
               <p class="card-text"><strong>Commentaires:</strong> {{ user.commentaire or 'N/A' }}</p>
             </div>
             <div class="mb-3">
-              <p class="card-text"><strong>Parrain:</strong> {{ user.parrain.name if user.parrain else 'N/A' }}</p>
-            </div>
-            <div class="mb-3">
               <p class="card-text"><strong>Fournisseur:</strong> {{ user.fournisseur or 'N/A' }}</p>
             </div>
           </div>
@@ -32,7 +29,49 @@
       </div>
     </div>
   </div>
-  <div class="text-center mt-4">
-    <a href="{{ url_for('show_users') }}" class="btn btn-primary btn-lg mb-3">Retour</a>
+
+  <div class="container mt-5">
+    <div class="row justify-content-center">
+      <div class="col-md-8">
+        <div class="card mx-auto mt-3">
+          <div class="card-header bg-primary text-white text-center" id="filleuls-header">
+            <h2>
+              Filleuls de {{ user.name }} ({{ user.filleuls|length }})
+              <span class="toggle-icon" onclick="toggleFilleuls()">⮛</span>
+            </h2>
+          </div>
+          <div class="card-body text-center" id="filleuls-list">
+            {% if user.filleuls %}
+              <ul class="list-group">
+                {% for filleul in user.filleuls %}
+                  <li class="list-group-item">{{ filleul.name }} - {{ filleul.SubscribeDate.strftime('%d/%m/%Y') }}</li>
+                {% endfor %}
+              </ul>
+            {% else %}
+              <p class="card-text">Aucun filleul</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
+
+  <div class="container mt-4">
+    <div class="row justify-content-center">
+      <div class="col-md-8 text-center">
+        <div class="text-center mt-4">
+          <a href="{{ url_for('show_users') }}" class="btn btn-primary btn-lg mb-3">Retour</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    function toggleFilleuls() {
+      var filleulsList = document.getElementById('filleuls-list');
+      filleulsList.style.display = (filleulsList.style.display === 'none' || filleulsList.style.display === '') ? 'block' : 'none';
+  
+      var toggleIcon = document.querySelector('#filleuls-header .toggle-icon');
+      toggleIcon.textContent = (filleulsList.style.display === 'none' || filleulsList.style.display === '') ? '⮛' : '⮜';
+    }
+  </script>
 {% endblock %}
